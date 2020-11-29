@@ -1,1 +1,45 @@
 
+A.Find the number of movies released between 1950 and 1960.
+-------------------------------------------------------------------------------------------------------
+Loading of dataset into movies relation:
+movies = LOAD  'moviesdatasetforpig.txt' using  PigStorage(',') AS (MID:Biginteger, MName:chararray, Year:int, Rating:double, Time:long);
+
+movies1950 = FILTER movies BY $2 >= 1950;
+movies1960 = FILTER movies1950 BY $2 <= 1960;
+date_count = Group movies1960 All;
+count = foreach date_count Generate COUNT(movies1960);
+dump count;
+
+B.Find the number of movies having rating more than 4.
+-------------------------------------------------------------------------------------------------------
+RatingMoreThan4 = FILTER movies BY $3 >= 4.0;
+rate_count = Group RatingMoreThan4 All;
+count = foreach rate_count Generate COUNT(RatingMoreThan4);
+dump count;
+
+C.Find the movies whose rating are between 3 and 4.
+-------------------------------------------------------------------------------------------------------
+c = FILTER movies BY $3 >= 3.0;
+d = FILTER c BY $3 <= 4.0;
+movie_list = FOREACH d GENERATE MName;
+dump movie_list;
+
+D.Finding movies with duration greater than 2 hours(7200 second):
+-------------------------------------------------------------------------------------------------------
+movies = LOAD  'moviesdatasetforpig.txt' using  PigStorage(',') AS (MID:Biginteger, MName:chararray, Year:int, Rating:double, Time:long);
+duration = FILTER movies BY $4 > 7200;
+time_sec = Group duration All;
+timecount = foreach time_sec Generate COUNT(duration);
+dump duration;
+
+E.Finding year and number of movies released in that year: 
+-----------------------------------------------------------------------------------------------------------
+grouped_by_year = group movies by Year; 
+count_by_years = foreach grouped_by_year generate group,COUNT(movies.MID); 
+dump count_by_years; 
+
+F.Find the total number of movies in the dataset.
+----------------------------------------------------------------------------------------------------------
+movie_count = Group movies All;
+movieALL= foreach movie_count Generate COUNT(movies);
+dump movieALL;
